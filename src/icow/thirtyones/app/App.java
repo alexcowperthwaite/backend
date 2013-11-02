@@ -29,7 +29,7 @@ public class App extends WebSocketServlet {
     
     private static final long serialVersionUID = 1L;
     
-    private static int PLAYERS_PER_GAME = 2;
+    private static int PLAYERS_PER_GAME = 1;
     
     private static final List<PlayerConnection> playerConnections = new ArrayList<PlayerConnection>();
     private static ThirtyOnesGame thirtyOnesGame;
