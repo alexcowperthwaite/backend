@@ -9,7 +9,7 @@ import icow.thirtyones.app.App.PlayerConnection;
 import icow.thirtyones.event.ClientEventType;
 import icow.thirtyones.util.Utils;
 
-public class KnockEventProcessor implements EventProcessor {
+public class KnockEventProcessor extends EndGameEvent implements EventProcessor {
 
     private final List<PlayerConnection> playerConnections;
     

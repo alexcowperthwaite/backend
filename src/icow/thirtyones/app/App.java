@@ -29,10 +29,12 @@ public class App extends WebSocketServlet {
 
 	private static final long serialVersionUID = 1L;
 
-	public static int PLAYERS_PER_GAME = 1;
+	public static int PLAYERS_PER_GAME = 3;
 
 	private static final List<PlayerConnection> playerConnections = new ArrayList<PlayerConnection>();
 	private static ThirtyOnesGame thirtyOnesGame;
+	
+	private static FrontEndConnection frontEndConnection;
 
 	/**
 	 * Constructor
@@ -45,12 +47,18 @@ public class App extends WebSocketServlet {
 
 		synchronized (playerConnections) {
 			if (thirtyOnesGame == null) {
+				if (playerConnections.size() == 0) {
+					// First client is frontend
+					frontEndConnection = new FrontEndConnection();
+					return frontEndConnection;
+				}
+				
 				// New Player connecting
 				PlayerConnection pc = new PlayerConnection(new Player(playerConnections.size() + 1));
 				playerConnections.add(pc);
 
 				if (playerConnections.size() == PLAYERS_PER_GAME) {
-					thirtyOnesGame = new ThirtyOnesGame(playerConnections);
+					thirtyOnesGame = new ThirtyOnesGame(playerConnections, frontEndConnection);
 					thirtyOnesGame.start();
 				}
 
@@ -118,6 +126,41 @@ public class App extends WebSocketServlet {
 
 		public void setMyTurn(boolean isMyTurn) {
 			this.isMyTurn = isMyTurn;
+		}
+	}
+	
+	public class FrontEndConnection extends MessageInbound {
+
+		private WsOutbound outbound;
+
+		@Override
+		public void onOpen(WsOutbound outbound) {
+			System.out.println("FrontEnd connected.");
+			this.setOutbound(outbound);
+		}
+
+		@Override
+		public void onClose(int status) {
+			System.out.println("FrontEnd disconnected.");
+		}
+
+		@Override
+		public void onTextMessage(CharBuffer cb) throws IOException {
+			System.out.println("FrontEnd Message Received : " + cb);
+
+		}
+
+		@Override
+		public void onBinaryMessage(ByteBuffer bb) throws IOException {
+			throw new NotImplementedException();
+		}
+
+		public WsOutbound getOutbound() {
+			return outbound;
+		}
+
+		public void setOutbound(WsOutbound outbound) {
+			this.outbound = outbound;
 		}
 	}
 }

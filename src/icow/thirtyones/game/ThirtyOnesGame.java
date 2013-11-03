@@ -1,5 +1,6 @@
 package icow.thirtyones.game;
 
+import icow.thirtyones.app.App.FrontEndConnection;
 import icow.thirtyones.app.App.PlayerConnection;
 import icow.thirtyones.event.ClientEventType;
 import icow.thirtyones.event.Event;
@@ -22,15 +23,17 @@ import java.util.Map;
 
 public class ThirtyOnesGame extends Thread {
 
-    private List<PlayerConnection> playerConnections;
+    private final List<PlayerConnection> playerConnections;
+    private final FrontEndConnection frontEndConnection;
     private Map<ServerEventType, EventProcessor> eventProcessors;
     
     private Deck deck;
     private Pile pile;
     
-    public ThirtyOnesGame(List<PlayerConnection> playerConnections ) {
+    public ThirtyOnesGame(List<PlayerConnection> playerConnections, FrontEndConnection frontEndConnection) {
         
     	this.playerConnections = playerConnections;
+    	this.frontEndConnection = frontEndConnection;
     }
     
     @Override
@@ -83,6 +86,18 @@ public class ThirtyOnesGame extends Thread {
         // Add the first card to the pile
         Card topCard = deck.drawCard();
         pile.putCard(topCard);
+        
+        // Tell frontend what the pile card is
+        // Build event
+        CharBuffer frontEndMessage = Utils.buildMessage(ClientEventType.CARD, topCard);
+       
+        // Send to client
+        try {
+        	frontEndConnection.getOutbound().writeTextMessage(frontEndMessage);
+        	frontEndConnection.getOutbound().flush();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         
         // Give the first player their turn
         playerConnections.get(0).setMyTurn(true);
