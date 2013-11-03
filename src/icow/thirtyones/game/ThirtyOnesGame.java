@@ -109,34 +109,6 @@ public class ThirtyOnesGame extends Thread {
         } catch (Exception e) {
             return;
         }
-             
-        // End player turn.
-        pc.setMyTurn(false);
         
-        // Discover next turn.
-        PlayerConnection pcWithNextTurn = null;
-        
-        for (int i = 0; i < playerConnections.size(); i++) {
-            if (playerConnections.get(i) == pc) {
-                if ((i + 1) == playerConnections.size()) {
-                    pcWithNextTurn = playerConnections.get(0);
-                } else {
-                    pcWithNextTurn = playerConnections.get(i+1);
-                }
-            }
-        }
-        
-        pcWithNextTurn.setMyTurn(true);
-        
-        // Notify next player of turn.
-        CharBuffer cb = Utils.buildMessage(ClientEventType.START_TURN, null);
-       
-        // Send to client.
-        try {
-            pcWithNextTurn.getOutbound().writeTextMessage(cb);
-            pcWithNextTurn.getOutbound().flush();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
     }
 }
