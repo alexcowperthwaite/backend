@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.nio.CharBuffer;
 import java.util.List;
 
+import icow.thirtyones.app.App;
 import icow.thirtyones.app.App.PlayerConnection;
 import icow.thirtyones.event.ClientEventType;
 import icow.thirtyones.model.Card;
@@ -34,30 +35,55 @@ public class PutCardEventProcessor implements EventProcessor {
         // If winner, send END_GAME to everyone
         if (pc.getPlayer().evaluate() == 31) {
         	
-        	// Build event
-            CharBuffer cb = Utils.buildMessage(ClientEventType.END_GAME, WINNER);
-           
-            // Send to client
-            try {
-                pc.getOutbound().writeTextMessage(cb);
-                pc.getOutbound().flush();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            
-            CharBuffer cbLoser = Utils.buildMessage(ClientEventType.END_GAME, LOSER);
-                        
-            for (PlayerConnection playerConnection : playerConnections) {
-            	if (playerConnection != pc) {
-                    // Send to client
-                    try {
-                        pc.getOutbound().writeTextMessage(cbLoser);
-                        pc.getOutbound().flush();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-            	}
-            }
+        	endGame(pc);
+        }
+        
+        // Otherwise check to see if someone knocked and it's the last turn; evaluate all hands and send winner
+        int playerPos = pc.getPlayer().getPosition();
+        int possibleKnockPos = playerPos == App.PLAYERS_PER_GAME ? 1 : playerPos + 1;
+                
+        if (playerConnections.get(possibleKnockPos).getPlayer().isKnocked()) {
+        	int max = 0;
+        	PlayerConnection curWinner = null;
+        	
+        	for (PlayerConnection playerConnection : playerConnections) {
+        		int handValue = playerConnection.getPlayer().evaluate();
+        	    if (handValue > max) {
+        	    	max = handValue;
+        	    	curWinner = playerConnection;
+        	    }
+        	}
+        	
+        	// Send win message to Client
+        	endGame(curWinner);
+        }
+    }
+    
+    public void endGame(PlayerConnection winner) {
+    	
+    	// Build event
+        CharBuffer cb = Utils.buildMessage(ClientEventType.END_GAME, WINNER);
+       
+        // Send to client
+        try {
+        	winner.getOutbound().writeTextMessage(cb);
+        	winner.getOutbound().flush();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        
+        CharBuffer cbLoser = Utils.buildMessage(ClientEventType.END_GAME, LOSER);
+                    
+        for (PlayerConnection playerConnection : playerConnections) {
+        	if (playerConnection != winner) {
+                // Send to client
+                try {
+                	winner.getOutbound().writeTextMessage(cbLoser);
+                	winner.getOutbound().flush();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+        	}
         }
     }
 }

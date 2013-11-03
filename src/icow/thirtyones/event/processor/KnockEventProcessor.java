@@ -19,6 +19,8 @@ public class KnockEventProcessor implements EventProcessor {
     @Override
     public void process(PlayerConnection pc, Object data) {
 
+    	pc.getPlayer().setKnocked(true);
+    	
         // Send message to all players that a knock has occurred.
         for (PlayerConnection playerConnection : playerConnections) {
             if (playerConnection != pc) {

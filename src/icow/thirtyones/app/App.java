@@ -29,7 +29,7 @@ public class App extends WebSocketServlet {
     
     private static final long serialVersionUID = 1L;
     
-    private static int PLAYERS_PER_GAME = 1;
+    public static int PLAYERS_PER_GAME = 1;
     
     private static final List<PlayerConnection> playerConnections = new ArrayList<PlayerConnection>();
     private static ThirtyOnesGame thirtyOnesGame;
@@ -46,7 +46,7 @@ public class App extends WebSocketServlet {
         synchronized(playerConnections) {
             if (thirtyOnesGame == null) {
                 // New Player connecting
-                PlayerConnection pc = new PlayerConnection(new Player());
+                PlayerConnection pc = new PlayerConnection(new Player(playerConnections.size() + 1));
                 playerConnections.add(pc);
                 
                 if (playerConnections.size() == PLAYERS_PER_GAME) {

@@ -7,7 +7,15 @@ import java.util.Map;
 public class Player {
 
     private List<Card> hand;
+    
+    private final int position;
+    
+    private boolean knocked = false;
 
+    public Player(int position) {
+    	this.position = position;
+    }
+    
     public List<Card> getHand() {
         return hand;
     }
@@ -39,5 +47,17 @@ public class Player {
         }
                 
         return maxValue;
+    }
+
+	public boolean isKnocked() {
+	    return knocked;
+    }
+
+	public void setKnocked(boolean knocked) {
+	    this.knocked = knocked;
+    }
+
+	public int getPosition() {
+	    return position;
     }
 }

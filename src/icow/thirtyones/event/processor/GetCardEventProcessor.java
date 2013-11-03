@@ -33,8 +33,6 @@ public class GetCardEventProcessor implements EventProcessor {
     		card = pile.getCard();
     	}
     	
-        
-        
         // Update the player object
         pc.getPlayer().getHand().add(card);
         
