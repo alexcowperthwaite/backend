@@ -19,8 +19,7 @@ public class Utils {
         final String jsonEvent = Utils.gson.toJson(event);
         
         // Create buffer
-        CharBuffer cb = CharBuffer.allocate(jsonEvent.length());
-        cb.put(jsonEvent);
+        CharBuffer cb = CharBuffer.wrap(jsonEvent);
         
         return cb;
     }
