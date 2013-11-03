@@ -2,6 +2,7 @@ package icow.thirtyones.util;
 
 import icow.thirtyones.event.Event;
 import icow.thirtyones.event.EventType;
+import icow.thirtyones.event.EventTypeDeserializer;
 
 import java.nio.CharBuffer;
 
@@ -10,7 +11,7 @@ import com.google.gson.GsonBuilder;
 
 public class Utils {
 
-    public static Gson gson = new GsonBuilder().create();
+    public static Gson gson = new GsonBuilder().registerTypeAdapter(EventType.class, new EventTypeDeserializer()).create();
     
     public static CharBuffer buildMessage(EventType eventType, Object data) {
         

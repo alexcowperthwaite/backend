@@ -29,12 +29,8 @@ public class ThirtyOnesGame extends Thread {
     private Pile pile;
     
     public ThirtyOnesGame(List<PlayerConnection> playerConnections ) {
-        this.playerConnections = playerConnections;
-
-        eventProcessors = new HashMap<ServerEventType, EventProcessor>();
-        eventProcessors.put(ServerEventType.KNOCK, new KnockEventProcessor(playerConnections));
-        eventProcessors.put(ServerEventType.GET_CARD, new GetCardEventProcessor(deck, pile));
-        eventProcessors.put(ServerEventType.PUT_CARD, new PutCardEventProcessor(pile, playerConnections));
+        
+    	this.playerConnections = playerConnections;
     }
     
     @Override
@@ -55,6 +51,13 @@ public class ThirtyOnesGame extends Thread {
         
         // Initialize pile
         pile = new Pile();
+        
+        // Register the event processors
+        eventProcessors = new HashMap<ServerEventType, EventProcessor>();
+        eventProcessors.put(ServerEventType.KNOCK, new KnockEventProcessor(playerConnections));
+        eventProcessors.put(ServerEventType.GET_CARD, new GetCardEventProcessor(deck, pile));
+        eventProcessors.put(ServerEventType.PUT_CARD, new PutCardEventProcessor(pile, playerConnections));
+
         
         // Send out BEGIN_GAME event to all players; give them cards.
         for (PlayerConnection pc : playerConnections) {
