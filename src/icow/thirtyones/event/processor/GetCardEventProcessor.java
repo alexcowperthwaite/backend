@@ -1,14 +1,14 @@
 package icow.thirtyones.event.processor;
 
-import java.io.IOException;
-import java.nio.CharBuffer;
-
-import icow.thirtyones.app.App.PlayerConnection;
 import icow.thirtyones.event.ClientEventType;
 import icow.thirtyones.model.Card;
 import icow.thirtyones.model.Deck;
 import icow.thirtyones.model.Pile;
+import icow.thirtyones.net.PlayerConnection;
 import icow.thirtyones.util.Utils;
+
+import java.io.IOException;
+import java.nio.CharBuffer;
 
 public class GetCardEventProcessor implements EventProcessor {
 

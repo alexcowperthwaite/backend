@@ -1,13 +1,13 @@
 package icow.thirtyones.event.processor;
 
+import icow.thirtyones.app.App;
+import icow.thirtyones.event.ClientEventType;
+import icow.thirtyones.net.PlayerConnection;
+import icow.thirtyones.util.Utils;
+
 import java.io.IOException;
 import java.nio.CharBuffer;
 import java.util.List;
-
-import icow.thirtyones.app.App;
-import icow.thirtyones.app.App.PlayerConnection;
-import icow.thirtyones.event.ClientEventType;
-import icow.thirtyones.util.Utils;
 
 public class KnockEventProcessor extends EndGameEvent implements EventProcessor {
 
@@ -44,7 +44,7 @@ public class KnockEventProcessor extends EndGameEvent implements EventProcessor 
     private void endTurn(PlayerConnection pc) {
 
 		// End player turn.
-		pc.setMyTurn(false);
+		pc.getPlayer().setMyTurn(false);
 
 		// Discover index of pc
 		int pcIndex = 0;
@@ -59,7 +59,7 @@ public class KnockEventProcessor extends EndGameEvent implements EventProcessor 
 		int nextPlayerIndex = pcIndex + 1 == App.PLAYERS_PER_GAME ? 0 : pcIndex + 1;
 		PlayerConnection nextPc = playerConnections.get(nextPlayerIndex);
 		
-		nextPc.setMyTurn(true);
+		nextPc.getPlayer().setMyTurn(true);
 
 		// Notify next player of turn.
 		CharBuffer cb = Utils.buildMessage(ClientEventType.START_TURN, null);

@@ -1,12 +1,12 @@
 package icow.thirtyones.event.processor;
 
+import icow.thirtyones.event.ClientEventType;
+import icow.thirtyones.net.PlayerConnection;
+import icow.thirtyones.util.Utils;
+
 import java.io.IOException;
 import java.nio.CharBuffer;
 import java.util.List;
-
-import icow.thirtyones.app.App.PlayerConnection;
-import icow.thirtyones.event.ClientEventType;
-import icow.thirtyones.util.Utils;
 
 public class EndGameEvent {
 

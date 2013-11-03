@@ -1,6 +1,6 @@
 package icow.thirtyones.event.processor;
 
-import icow.thirtyones.app.App.PlayerConnection;
+import icow.thirtyones.net.PlayerConnection;
 
 public interface EventProcessor {
 

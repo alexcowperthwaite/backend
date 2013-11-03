@@ -1,7 +1,5 @@
 package icow.thirtyones.game;
 
-import icow.thirtyones.app.App.FrontEndConnection;
-import icow.thirtyones.app.App.PlayerConnection;
 import icow.thirtyones.event.ClientEventType;
 import icow.thirtyones.event.Event;
 import icow.thirtyones.event.ServerEventType;
@@ -12,6 +10,8 @@ import icow.thirtyones.event.processor.PutCardEventProcessor;
 import icow.thirtyones.model.Card;
 import icow.thirtyones.model.Deck;
 import icow.thirtyones.model.Pile;
+import icow.thirtyones.net.FrontEndConnection;
+import icow.thirtyones.net.PlayerConnection;
 import icow.thirtyones.util.Utils;
 
 import java.io.IOException;
@@ -100,7 +100,7 @@ public class ThirtyOnesGame extends Thread {
         }
         
         // Give the first player their turn
-        playerConnections.get(0).setMyTurn(true);
+        playerConnections.get(0).getPlayer().setMyTurn(true);
         
         CharBuffer cb = Utils.buildMessage(ClientEventType.START_TURN, null);
         try {
@@ -114,7 +114,7 @@ public class ThirtyOnesGame extends Thread {
     public void processEvent(PlayerConnection pc, Event message) {
 
         // Do not process requests from clients whos turn it isn't.
-        if (!pc.isMyTurn()) {
+        if (!pc.getPlayer().isMyTurn()) {
             return;
         }
         

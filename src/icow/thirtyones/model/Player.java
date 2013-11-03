@@ -11,6 +11,7 @@ public class Player {
     private final int position;
     
     private boolean knocked = false;
+	private boolean isMyTurn = false;
 
     public Player(int position) {
     	this.position = position;
@@ -60,4 +61,12 @@ public class Player {
 	public int getPosition() {
 	    return position;
     }
+
+	public boolean isMyTurn() {
+		return isMyTurn;
+	}
+
+	public void setMyTurn(boolean isMyTurn) {
+		this.isMyTurn = isMyTurn;
+	}
 }

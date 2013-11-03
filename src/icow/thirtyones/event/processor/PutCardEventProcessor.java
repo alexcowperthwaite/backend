@@ -1,19 +1,19 @@
 package icow.thirtyones.event.processor;
 
-import java.io.IOException;
-import java.nio.CharBuffer;
-import java.util.List;
-
-import com.google.gson.internal.LinkedTreeMap;
-
 import icow.thirtyones.app.App;
-import icow.thirtyones.app.App.PlayerConnection;
 import icow.thirtyones.event.ClientEventType;
 import icow.thirtyones.model.Card;
 import icow.thirtyones.model.Pile;
 import icow.thirtyones.model.Suit;
 import icow.thirtyones.model.Value;
+import icow.thirtyones.net.PlayerConnection;
 import icow.thirtyones.util.Utils;
+
+import java.io.IOException;
+import java.nio.CharBuffer;
+import java.util.List;
+
+import com.google.gson.internal.LinkedTreeMap;
 
 public class PutCardEventProcessor extends EndGameEvent implements EventProcessor {
 
@@ -71,7 +71,7 @@ public class PutCardEventProcessor extends EndGameEvent implements EventProcesso
 	private void endTurn(PlayerConnection pc) {
 
 		// End player turn.
-		pc.setMyTurn(false);
+		pc.getPlayer().setMyTurn(false);
 
 		// Discover index of pc
 		int pcIndex = 0;
@@ -86,7 +86,7 @@ public class PutCardEventProcessor extends EndGameEvent implements EventProcesso
 		int nextPlayerIndex = pcIndex + 1 == App.PLAYERS_PER_GAME ? 0 : pcIndex + 1;
 		PlayerConnection nextPc = playerConnections.get(nextPlayerIndex);
 		
-		nextPc.setMyTurn(true);
+		nextPc.getPlayer().setMyTurn(true);
 
 		// Notify next player of turn.
 		CharBuffer cb = Utils.buildMessage(ClientEventType.START_TURN, null);
