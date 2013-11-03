@@ -4,7 +4,7 @@ import java.util.Stack;
 
 public class Pile {
 
-    private Stack<Card> cards;
+    private Stack<Card> cards = new Stack<Card>();
     
     public void putCard(Card card) {
         cards.push(card);

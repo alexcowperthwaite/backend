@@ -20,7 +20,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class ThirtyOnesGame {
+public class ThirtyOnesGame extends Thread {
 
     private List<PlayerConnection> playerConnections;
     private Map<ServerEventType, EventProcessor> eventProcessors;
@@ -37,8 +37,18 @@ public class ThirtyOnesGame {
         eventProcessors.put(ServerEventType.PUT_CARD, new PutCardEventProcessor(pile, playerConnections));
     }
     
-    public void start() {
+    @Override
+    public void run() {
         
+    	// Wait for last thread
+    	synchronized(this) {
+	    	try {
+		        wait(1000);
+	        } catch (InterruptedException e1) {
+		        e1.printStackTrace();
+	        }
+    	}
+    	
         // Initialize and shuffle deck
         deck = new Deck();
         deck.shuffle();
