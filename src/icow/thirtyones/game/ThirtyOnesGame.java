@@ -24,16 +24,16 @@ import java.util.Map;
 public class ThirtyOnesGame extends Thread {
 
     private final List<PlayerConnection> playerConnections;
-    private final FrontEndConnection frontEndConnection;
+    private final List<FrontEndConnection> frontEndConnections;
     private Map<ServerEventType, EventProcessor> eventProcessors;
     
     private Deck deck;
     private Pile pile;
     
-    public ThirtyOnesGame(List<PlayerConnection> playerConnections, FrontEndConnection frontEndConnection) {
+    public ThirtyOnesGame(List<PlayerConnection> playerConnections, List<FrontEndConnection> frontEndConnections) {
         
     	this.playerConnections = playerConnections;
-    	this.frontEndConnection = frontEndConnection;
+    	this.frontEndConnections = frontEndConnections;
     }
     
     @Override
@@ -58,7 +58,7 @@ public class ThirtyOnesGame extends Thread {
         // Register the event processors
         eventProcessors = new HashMap<ServerEventType, EventProcessor>();
         eventProcessors.put(ServerEventType.KNOCK, new KnockEventProcessor(playerConnections));
-        eventProcessors.put(ServerEventType.GET_CARD, new GetCardEventProcessor(deck, pile));
+        eventProcessors.put(ServerEventType.GET_CARD, new GetCardEventProcessor(deck, pile, frontEndConnections));
         eventProcessors.put(ServerEventType.PUT_CARD, new PutCardEventProcessor(pile, playerConnections));
 
         
@@ -93,8 +93,8 @@ public class ThirtyOnesGame extends Thread {
        
         // Send to client
         try {
-        	frontEndConnection.getOutbound().writeTextMessage(frontEndMessage);
-        	frontEndConnection.getOutbound().flush();
+        	frontEndConnections.get(0).getOutbound().writeTextMessage(frontEndMessage);
+        	frontEndConnections.get(0).getOutbound().flush();
         } catch (IOException e) {
             e.printStackTrace();
         }

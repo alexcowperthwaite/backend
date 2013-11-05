@@ -28,7 +28,8 @@ public class PutCardEventProcessor extends EndGameEvent implements EventProcesso
 	@Override
 	public void process(PlayerConnection pc, Object data) {
 
-		LinkedTreeMap<String, String> ltm = (LinkedTreeMap<String, String>) data;
+		@SuppressWarnings("unchecked")
+        LinkedTreeMap<String, String> ltm = (LinkedTreeMap<String, String>) data;
 
 		Card card = new Card(Suit.valueOf(ltm.get("suit")), Value.valueOf(ltm.get("value")));
 

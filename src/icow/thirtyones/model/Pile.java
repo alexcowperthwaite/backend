@@ -13,4 +13,8 @@ public class Pile {
     public Card getCard() {
         return cards.pop();
     }
+    
+    public Card peekCard() {
+    	return cards.peek();
+    }
 }
