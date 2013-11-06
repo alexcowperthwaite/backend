@@ -59,7 +59,7 @@ public class ThirtyOnesGame extends Thread {
         eventProcessors = new HashMap<ServerEventType, EventProcessor>();
         eventProcessors.put(ServerEventType.KNOCK, new KnockEventProcessor(playerConnections));
         eventProcessors.put(ServerEventType.GET_CARD, new GetCardEventProcessor(deck, pile, frontEndConnections));
-        eventProcessors.put(ServerEventType.PUT_CARD, new PutCardEventProcessor(pile, playerConnections));
+        eventProcessors.put(ServerEventType.PUT_CARD, new PutCardEventProcessor(pile, playerConnections, frontEndConnections));
 
         
         // Send out BEGIN_GAME event to all players; give them cards.
@@ -67,9 +67,9 @@ public class ThirtyOnesGame extends Thread {
             
             // Set the player's hand to 3 cards.
             List<Card> hand = new ArrayList<Card>();
-            hand.add(deck.drawCard());
-            hand.add(deck.drawCard());
-            hand.add(deck.drawCard());
+            hand.add(deck.getCard());
+            hand.add(deck.getCard());
+            hand.add(deck.getCard());
             pc.getPlayer().setHand(hand);
             
             // Build event
@@ -84,7 +84,7 @@ public class ThirtyOnesGame extends Thread {
         }
         
         // Add the first card to the pile
-        Card topCard = deck.drawCard();
+        Card topCard = deck.getCard();
         pile.putCard(topCard);
         
         // Tell frontend what the pile card is

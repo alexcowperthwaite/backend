@@ -6,6 +6,7 @@ import icow.thirtyones.model.Card;
 import icow.thirtyones.model.Pile;
 import icow.thirtyones.model.Suit;
 import icow.thirtyones.model.Value;
+import icow.thirtyones.net.FrontEndConnection;
 import icow.thirtyones.net.PlayerConnection;
 import icow.thirtyones.util.Utils;
 
@@ -19,21 +20,25 @@ public class PutCardEventProcessor extends EndGameEvent implements EventProcesso
 
 	private final Pile pile;
 	private final List<PlayerConnection> playerConnections;
+	private final List<FrontEndConnection> frontEndConnections;
 
-	public PutCardEventProcessor(Pile pile, List<PlayerConnection> playerConnections) {
+	public PutCardEventProcessor(Pile pile, List<PlayerConnection> playerConnections, List<FrontEndConnection> frontEndConnections) {
 		this.pile = pile;
 		this.playerConnections = playerConnections;
+		this.frontEndConnections = frontEndConnections;
 	}
 
 	@Override
 	public void process(PlayerConnection pc, Object data) {
 
 		@SuppressWarnings("unchecked")
-        LinkedTreeMap<String, String> ltm = (LinkedTreeMap<String, String>) data;
+		LinkedTreeMap<String, String> ltm = (LinkedTreeMap<String, String>) data;
 
 		Card card = new Card(Suit.valueOf(ltm.get("suit")), Value.valueOf(ltm.get("value")));
 
 		pile.putCard(card);
+
+		updateFrontEnd();
 
 		// Check the user's hand for a 31-win (any 2 of 10, J, Q, K with 1 ACE
 		// all same suit)
@@ -47,11 +52,11 @@ public class PutCardEventProcessor extends EndGameEvent implements EventProcesso
 			// evaluate all hands and send winner
 			int playerPos = pc.getPlayer().getPosition();
 			int nextPlayerPos = playerPos == App.PLAYERS_PER_GAME ? 0 : playerPos + 1;
-	
+
 			if (playerConnections.get(nextPlayerPos).getPlayer().isKnocked()) {
 				int max = 0;
 				PlayerConnection curWinner = null;
-	
+
 				for (PlayerConnection playerConnection : playerConnections) {
 					int handValue = playerConnection.getPlayer().evaluate();
 					if (handValue > max) {
@@ -59,14 +64,28 @@ public class PutCardEventProcessor extends EndGameEvent implements EventProcesso
 						curWinner = playerConnection;
 					}
 				}
-	
+
 				// Send win message to Client
 				endGame(curWinner, playerConnections);
 			} else {
 				endTurn(pc);
 			}
 		}
-		
+
+	}
+
+	private void updateFrontEnd() {
+		// Tell frontend what the pile card is
+        // Build event
+        CharBuffer frontEndMessage = Utils.buildMessage(ClientEventType.CARD, pile.peekCard());
+       
+        // Send to client
+        try {
+        	frontEndConnections.get(0).getOutbound().writeTextMessage(frontEndMessage);
+        	frontEndConnections.get(0).getOutbound().flush();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 	}
 
 	private void endTurn(PlayerConnection pc) {
@@ -76,17 +95,17 @@ public class PutCardEventProcessor extends EndGameEvent implements EventProcesso
 
 		// Discover index of pc
 		int pcIndex = 0;
-		
+
 		for (int i = 0; i < playerConnections.size(); i++) {
 			if (playerConnections.get(i) == pc) {
 				pcIndex = i;
 			}
 		}
-		
+
 		// Discover next turn.
 		int nextPlayerIndex = pcIndex + 1 == App.PLAYERS_PER_GAME ? 0 : pcIndex + 1;
 		PlayerConnection nextPc = playerConnections.get(nextPlayerIndex);
-		
+
 		nextPc.getPlayer().setMyTurn(true);
 
 		// Notify next player of turn.
@@ -100,6 +119,5 @@ public class PutCardEventProcessor extends EndGameEvent implements EventProcesso
 			e.printStackTrace();
 		}
 	}
-	
 
 }

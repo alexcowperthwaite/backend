@@ -4,6 +4,7 @@ import icow.thirtyones.event.ClientEventType;
 import icow.thirtyones.model.Card;
 import icow.thirtyones.model.Deck;
 import icow.thirtyones.model.Pile;
+import icow.thirtyones.model.StackableCards;
 import icow.thirtyones.net.FrontEndConnection;
 import icow.thirtyones.net.PlayerConnection;
 import icow.thirtyones.util.Utils;
@@ -15,8 +16,8 @@ import java.util.List;
 public class GetCardEventProcessor implements EventProcessor {
 
 	private final List<FrontEndConnection> frontEndConnections;
-	private final Deck deck;
-	private final Pile pile;
+	private StackableCards deck;
+	private StackableCards pile;
 
 	public GetCardEventProcessor(Deck deck, Pile pile, List<FrontEndConnection> frontEndConnections) {
 		this.deck = deck;
@@ -32,7 +33,13 @@ public class GetCardEventProcessor implements EventProcessor {
 		Card card = null;
 
 		if (getCardFromDeck) {
-			card = deck.drawCard();
+			if (deck.isEmpty()) {
+			    Card lastCard = pile.getCard();
+				deck = pile;
+				((Deck)deck).shuffle();
+				((Pile)pile).putCard(lastCard);
+			}
+			card = deck.getCard();
 		} else {
 			card = pile.getCard();
 		}
@@ -57,7 +64,13 @@ public class GetCardEventProcessor implements EventProcessor {
 		if (!getCardFromDeck) {
 			// Tell frontend what the pile card is
 	        // Build event
-	        CharBuffer frontEndMessage = Utils.buildMessage(ClientEventType.CARD, pile.peekCard());
+		    CharBuffer frontEndMessage = null;
+		    if(pile.isEmpty()) {
+		        // send blank card representation
+		        frontEndMessage = Utils.buildMessage(ClientEventType.CARD, null);
+		    } else {
+		        frontEndMessage = Utils.buildMessage(ClientEventType.CARD, ((Pile)pile).peekCard());
+		    }
 	       
 	        // Send to client
 	        try {

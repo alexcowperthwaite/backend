@@ -3,10 +3,8 @@ package icow.thirtyones.model;
 import java.util.Collections;
 import java.util.Stack;
 
-public class Deck {
+public class Deck extends StackableCards {
 
-    private Stack<Card> cards;
-    
     public Deck() {
         cards = new Stack<Card>();
         
@@ -20,8 +18,5 @@ public class Deck {
     public void shuffle() {
         Collections.shuffle(cards);
     }
-    
-    public Card drawCard() {
-        return cards.pop();
-    }
+
 }
